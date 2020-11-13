@@ -1,5 +1,7 @@
 .idea
 __pycache__
-results
+tests
 venv
-original.avi
+input.avi
+dataset
+test.py

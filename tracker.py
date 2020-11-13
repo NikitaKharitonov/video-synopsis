@@ -6,6 +6,7 @@ from numpy import dot
 from scipy.linalg import block_diag
 from scipy.linalg import inv
 import os
+import json
 
 # Global variables to be used by functions of VideoFileClop
 frame_count = 0  # frame counter
@@ -226,7 +227,7 @@ def crop(frame, bbox):
     return frame[y0:y1, x0:x1]
 
 
-def pipeline(original_img, file, cropped_images_path):
+def pipeline(original_img, cropped_images_path, tracked_data):
     """
     Pipeline function for detection and tracking
     """
@@ -241,7 +242,7 @@ def pipeline(original_img, file, cropped_images_path):
 
     detections = detect_humans(img)  # x y w h
     for index, det in enumerate(detections):
-        detections[index] = [det[1], det[0], det[1] + det[3], det[0] + det[2]]
+        detections[index] = [det[1], det[0], det[1] + det[3], det[0] + det[2]] # y_up x_left y_down x_right
 
     trackers = []
 
@@ -298,19 +299,22 @@ def pipeline(original_img, file, cropped_images_path):
             trackers[trk_idx] = xx
 
     # The list of tracks to be annotated
-    data = []
+    frame_data = []
     for trk in tracker_list:
         if (trk.hits >= min_hits) and (trk.no_losses <= max_age):
             x_cv2 = trk.box
             if x_cv2[0] > -1 and x_cv2[1] > -1 and x_cv2[2] > -1 and x_cv2[3] > -1:
                 img = draw_box_label(trk.id, img, x_cv2, trk.color)  # Draw the bounding boxes on the images
                 cropped_img = crop(original_img, trk.box)
-                data.append([trk.id, [x_cv2[0], x_cv2[1], x_cv2[2], x_cv2[3]]])
+                object_data = {'id':trk.id, 'y_up':x_cv2[0], 'x_left':x_cv2[1], 'y_down':x_cv2[2], 'x_right':x_cv2[3]}
+                frame_data.append(object_data)
+                # frame_data.append([trk.id, [x_cv2[0], x_cv2[1], x_cv2[2], x_cv2[3]]])
                 if cropped_img.shape[0] != 0 and cropped_img.shape[1] != 0:
                     cv2.imwrite(os.path.join(cropped_images_path, f'{trk.frame}_{trk.id}.png'), cropped_img)
                 trk.frame += 1
 
-    file.write(str(data) + '\n')
+    tracked_data['frames'].append(frame_data)
+    # file.write(str(frame_data) + '\n')
 
     tracker_list = [x for x in tracker_list if x.no_losses <= max_age]
     frame_count += 1
@@ -318,51 +322,54 @@ def pipeline(original_img, file, cropped_images_path):
     return img
 
 
-def track_video(original_video, tracked_data_output_file, cropped_images_folder, background):
+def track_video(input_video, tracked_data_output_file, cropped_images_folder):
     if not os.path.exists(cropped_images_folder):
         os.mkdir(cropped_images_folder)
 
-    cap = cv2.VideoCapture(original_video)
-    ret, frame = cap.read()
-    cv2.imwrite(background, frame)
+    cap = cv2.VideoCapture(input_video)
+
+    tracked_data = {'frames': []}
+
+    while True:
+
+        ret, img = cap.read()
+        if not ret:
+            break
+        np.asarray(img)
+        pipeline(img, cropped_images_folder, tracked_data)
 
     with open(tracked_data_output_file, "w") as file:
-
-        while True:
-
-            ret, img = cap.read()
-            if not ret:
-                break
-            np.asarray(img)
-            pipeline(img, file, cropped_images_folder)
+        json.dump(tracked_data, file)
 
     cap.release()
     cv2.destroyAllWindows()
 
 
-def track_camera(number, original_video, tracked_data_output_file, cropped_images_folder, background):
+def track_camera(number, input_video, tracked_data_output_file, cropped_images_folder):
     if not os.path.exists(cropped_images_folder):
         os.mkdir(cropped_images_folder)
 
     cap = cv2.VideoCapture(number)
     ret, frame = cap.read()
-    cv2.imwrite(background, frame)
     fourcc = cv2.VideoWriter_fourcc(*'XVID')
-    out = cv2.VideoWriter(original_video, fourcc, 40, (frame.shape[1], frame.shape[0]))
+    out = cv2.VideoWriter(input_video, fourcc, 40, (frame.shape[1], frame.shape[0]))
+
+    tracked_data = {'frames': []}
+
+    while True:
+
+        ret, img = cap.read()
+        if not ret:
+            break
+        np.asarray(img)
+        new_img = pipeline(img, cropped_images_folder, tracked_data)
+        cv2.imshow("frame", new_img)
+        out.write(new_img)
+        if cv2.waitKey(1) & 0xFF == ord('q'):
+            break
 
     with open(tracked_data_output_file, "w") as file:
-
-        while True:
-
-            ret, img = cap.read()
-            if not ret:
-                break
-            np.asarray(img)
-            new_img = pipeline(img, file, cropped_images_folder)
-            cv2.imshow("frame", new_img)
-            out.write(new_img)
-            if cv2.waitKey(1) & 0xFF == ord('q'):
-                break
+        json.dump(tracked_data, file)
 
     out.release()
     cap.release()

@@ -4,10 +4,11 @@ import video_maker
 import shutil
 import os
 from datetime import datetime
+import background_getter
 
 # Initialize required paths
-ORIGINAL_VIDEO = 'original.avi'
-TRACKED_DATA = 'tracked_data'
+INPUT_VIDEO = 'input.avi'
+TRACKED_DATA = 'tracked_data.json'
 ANALYZED_DATA = 'analyzed_data.json'
 CROPPED_IMAGES_FOLDER = 'cropped_images'
 
@@ -15,32 +16,36 @@ if not os.path.exists(CROPPED_IMAGES_FOLDER):
     os.mkdir(CROPPED_IMAGES_FOLDER)
 
 BACKGROUND = 'background.png'
-RESULT_VIDEO_FILENAME = 'result.avi'
-RESULTS_FOLDER = 'results'
+OUTPUT_VIDEO_FILENAME = 'output.avi'
+TESTS_FOLDER = 'tests'
 TIMESTAMP_FORMAT = "%Y_%m_%d_%H_%M_%S"
 
-if not os.path.exists(RESULTS_FOLDER):
-    os.mkdir(RESULTS_FOLDER)
+if not os.path.exists(TESTS_FOLDER):
+    os.mkdir(TESTS_FOLDER)
 
 timestamp = datetime.now().strftime(TIMESTAMP_FORMAT)
-RESULT_FOLDER = os.path.join(RESULTS_FOLDER, timestamp)
+CURRENT_TEST_FOLDER = os.path.join(TESTS_FOLDER, timestamp)
 
-if not os.path.exists(RESULT_FOLDER):
-    os.mkdir(RESULT_FOLDER)
+if not os.path.exists(CURRENT_TEST_FOLDER):
+    os.mkdir(CURRENT_TEST_FOLDER)
 
-RESULT_VIDEO = os.path.join(RESULT_FOLDER, RESULT_VIDEO_FILENAME)
+OUTPUT_VIDEO = os.path.join(CURRENT_TEST_FOLDER, OUTPUT_VIDEO_FILENAME)
 
 print('Tracking objects...')
-tracker.track_camera(0, ORIGINAL_VIDEO, TRACKED_DATA, CROPPED_IMAGES_FOLDER, BACKGROUND)
+tracker.track_camera(0, INPUT_VIDEO, TRACKED_DATA, CROPPED_IMAGES_FOLDER)
+
+print('Subtracting the background...')
+background_getter.get(INPUT_VIDEO, BACKGROUND)
 
 print('Analyzing tracked data...')
-analyzer.process(TRACKED_DATA, ANALYZED_DATA)
+analyzer.analyze_json(TRACKED_DATA, ANALYZED_DATA)
 
 print('Making result video...')
-video_maker.make(CROPPED_IMAGES_FOLDER, ANALYZED_DATA, BACKGROUND, RESULT_VIDEO)
+video_maker.make(CROPPED_IMAGES_FOLDER, ANALYZED_DATA, BACKGROUND, OUTPUT_VIDEO)
+print(f'Result video saved to {OUTPUT_VIDEO}')
 
 # Copy the original video to the sample folder
-shutil.copy(ORIGINAL_VIDEO, RESULT_FOLDER)
+shutil.copy(INPUT_VIDEO, CURRENT_TEST_FOLDER)
 
 # Move and delete redundant files and folders
 for file in os.listdir(CROPPED_IMAGES_FOLDER):
