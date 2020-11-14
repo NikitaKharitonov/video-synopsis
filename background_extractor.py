@@ -2,10 +2,10 @@ import numpy as np
 import cv2 as cv
 import os
 
-FRAMES_FOLDER = 'frames'
 
+def extract(video_filename, background_path, current_test_path):
+    FRAMES_FOLDER = os.path.join(current_test_path, 'frames')
 
-def get(video_filename, background_path):
     if os.path.exists(FRAMES_FOLDER):
         for file in os.listdir(FRAMES_FOLDER):
             os.remove(os.path.join(FRAMES_FOLDER, file))

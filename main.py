@@ -4,7 +4,8 @@ import video_maker
 import shutil
 import os
 from datetime import datetime
-import background_getter
+import background_extractor
+
 
 # Initialize required paths
 INPUT_VIDEO = 'input.avi'
@@ -32,10 +33,10 @@ if not os.path.exists(CURRENT_TEST_FOLDER):
 OUTPUT_VIDEO = os.path.join(CURRENT_TEST_FOLDER, OUTPUT_VIDEO_FILENAME)
 
 print('Tracking objects...')
-tracker.track_camera(0, INPUT_VIDEO, TRACKED_DATA, CROPPED_IMAGES_FOLDER)
+tracker.track_video(INPUT_VIDEO, TRACKED_DATA, CROPPED_IMAGES_FOLDER)
 
-print('Subtracting the background...')
-background_getter.get(INPUT_VIDEO, BACKGROUND)
+print('Extracting the background...')
+background_extractor.extract(INPUT_VIDEO, BACKGROUND, CURRENT_TEST_FOLDER)
 
 print('Analyzing tracked data...')
 analyzer.analyze_json(TRACKED_DATA, ANALYZED_DATA)
