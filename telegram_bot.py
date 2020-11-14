@@ -9,8 +9,9 @@ import analyzer
 import background_extractor
 import tracker
 import video_maker
+import config
 
-TOKEN = '1459716558:AAHpUsnuG1ztHvonS0b6KD6lGkvVRZWnIX8'
+TOKEN = config.token
 bot = telebot.TeleBot(TOKEN)
 server = Flask(__name__)
 
