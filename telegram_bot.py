@@ -16,14 +16,14 @@ bot = telebot.TeleBot(TOKEN)
 server = Flask(__name__)
 
 
-@bot.message_handler(commands=['start'])
+@bot.message_handler(commands=['start', 'help'])
 def start(message):
-    bot.reply_to(message, 'Hello, ' + message.from_user.first_name)
+    bot.reply_to(message, 'Hello, ' + message.from_user.first_name + '! Send me an .avi video file and I will send you its summary')
 
 
-@bot.message_handler(func=lambda message: True, content_types=['text'])
-def echo_message(message):
-    bot.reply_to(message, message.text)
+# @bot.message_handler(func=lambda message: True, content_types=['text'])
+# def echo_message(message):
+#     bot.reply_to(message, message.text)
 
 
 @server.route('/' + TOKEN, methods=['POST'])
@@ -43,6 +43,8 @@ def webhook():
 def get_video(message):
     try:
         file_name = message.document.file_name
+        if file_name.split('.')[-1] != 'avi':
+            raise Exception('.avi files only!')
         file_id_info = bot.get_file(message.document.file_id)
         downloaded_file = bot.download_file(file_id_info.file_path)
 
@@ -85,15 +87,23 @@ def get_video(message):
             bot.send_document(message.chat.id, output)
 
         # Move and delete redundant files and folders
-        for file in os.listdir(cropped_images_folder_path):
-            os.remove(path.join(cropped_images_folder_path, file))
+        for filename in os.listdir(cropped_images_folder_path):
+            filepath = path.join(cropped_images_folder_path, filename)
+            if path.exists(filepath):
+                os.remove(filepath)
 
-        os.rmdir(cropped_images_folder_path)
-        os.remove(background_path)
-        os.remove(tracked_data_path)
-        os.remove(analyzed_data_path)
-        os.remove(input_video_path)
-        os.remove(output_video_path)
+        if path.exists(cropped_images_folder_path):
+            os.rmdir(cropped_images_folder_path)
+        if path.exists(background_path):
+            os.remove(background_path)
+        if path.exists(tracked_data_path):
+            os.remove(tracked_data_path)
+        if path.exists(analyzed_data_path):
+            os.remove(analyzed_data_path)
+        if path.exists(input_video_path):
+            os.remove(input_video_path)
+        if path.exists(output_video_path):
+            os.remove(output_video_path)
 
     except Exception as ex:
         bot.send_message(message.chat.id, "[!] error - {}".format(str(ex)))
