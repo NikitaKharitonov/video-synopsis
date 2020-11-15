@@ -7,9 +7,11 @@ from scipy.linalg import block_diag
 from scipy.linalg import inv
 import os
 import json
+import datetime
 
 # Global variables to be used by functions of VideoFileClop
 frame_count = 0  # frame counter
+fps = 0
 tracker_count = 0
 max_age = 15  # no.of consecutive unmatched detection before
 # a track is deleted
@@ -298,6 +300,8 @@ def pipeline(original_img, cropped_images_path, tracked_data):
             tmp_trk.box = xx
             trackers[trk_idx] = xx
 
+    time = str(datetime.timedelta(seconds=frame_count/fps)).split('.')[0]
+
     # The list of tracks to be annotated
     frame_data = []
     for trk in tracker_list:
@@ -306,7 +310,8 @@ def pipeline(original_img, cropped_images_path, tracked_data):
             if x_cv2[0] > -1 and x_cv2[1] > -1 and x_cv2[2] > -1 and x_cv2[3] > -1:
                 img = draw_box_label(trk.id, img, x_cv2, trk.color)  # Draw the bounding boxes on the images
                 cropped_img = crop(original_img, trk.box)
-                object_data = {'id':trk.id, 'y_up':x_cv2[0], 'x_left':x_cv2[1], 'y_down':x_cv2[2], 'x_right':x_cv2[3]}
+                # cropped_img = cv2.putText(cropped_img, time, (0,cropped_img.shape[0]),cv2.FONT_HERSHEY_SIMPLEX, cropped_img.shape[1]/240,(0,255,0),1)
+                object_data = {'id':trk.id, 'y_up':x_cv2[0], 'x_left':x_cv2[1], 'y_down':x_cv2[2], 'x_right':x_cv2[3], 'time': time}
                 frame_data.append(object_data)
                 # frame_data.append([trk.id, [x_cv2[0], x_cv2[1], x_cv2[2], x_cv2[3]]])
                 if cropped_img.shape[0] != 0 and cropped_img.shape[1] != 0:
@@ -323,6 +328,7 @@ def pipeline(original_img, cropped_images_path, tracked_data):
 
 
 def track_video(input_video, tracked_data_output_file, cropped_images_folder):
+    global fps
     if not os.path.exists(cropped_images_folder):
         os.mkdir(cropped_images_folder)
 
@@ -331,6 +337,7 @@ def track_video(input_video, tracked_data_output_file, cropped_images_folder):
     tracked_data = {'frames': []}
 
     while True:
+        fps = cap.get(cv2.CAP_PROP_FPS)
 
         ret, img = cap.read()
         if not ret:
@@ -346,6 +353,7 @@ def track_video(input_video, tracked_data_output_file, cropped_images_folder):
 
 
 def track_camera(number, input_video, tracked_data_output_file, cropped_images_folder):
+    global fps
     if not os.path.exists(cropped_images_folder):
         os.mkdir(cropped_images_folder)
 
@@ -357,6 +365,7 @@ def track_camera(number, input_video, tracked_data_output_file, cropped_images_f
     tracked_data = {'frames': []}
 
     while True:
+        fps = cap.get(cv2.CAP_PROP_FPS)
 
         ret, img = cap.read()
         if not ret:
@@ -364,7 +373,7 @@ def track_camera(number, input_video, tracked_data_output_file, cropped_images_f
         np.asarray(img)
         new_img = pipeline(img, cropped_images_folder, tracked_data)
         cv2.imshow("frame", new_img)
-        out.write(new_img)
+        out.write(img)
         if cv2.waitKey(1) & 0xFF == ord('q'):
             break
 
