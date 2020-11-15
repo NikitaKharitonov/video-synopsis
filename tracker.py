@@ -17,7 +17,7 @@ max_age = 15  # no.of consecutive unmatched detection before
 # a track is deleted
 min_hits = 1  # no. of consecutive matches needed to establish a track
 tracker_list = []  # list for trackers
-MODEL_TYPES = ['ssd_mobilenet_v1_coco_2017_11_17/', 'ssd_mobilenet_v3_large_coco_2020_01_14/']
+MODEL_TYPES = ['ssd_v1/', 'ssd_v2/']
 models_path = 'models/'
 model_type = MODEL_TYPES[1]
 config_file_name = 'config.pbtxt'
