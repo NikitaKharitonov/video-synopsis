@@ -5,6 +5,6 @@ venv
 input.avi
 dataset
 test.py
-models/ssd_mobilenet_v1_coco_2017_11_17
-models/ssd_mobilenet_v3_large_coco_2020_01_14
-models/yolo
+models/ssd_v1
+models/ssd_v2
+models/yolo_v3
