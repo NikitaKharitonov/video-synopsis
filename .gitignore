@@ -5,6 +5,3 @@ venv
 input.avi
 dataset
 test.py
-models/ssd_v1
-models/ssd_v3
-models/yolo_v3
