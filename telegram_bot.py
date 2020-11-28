@@ -10,6 +10,7 @@ import background_extractor
 import tracker
 import video_maker
 import config
+import yolo_deepsort_detector
 
 TOKEN = config.token
 bot = telebot.TeleBot(TOKEN)
@@ -68,11 +69,11 @@ def get_video(message):
             os.mkdir(cropped_images_folder_path)
 
         background_path = path.join(current_test_folder_path, 'background.png')
-        output_video_filename = f'{path.splitext(file_name)[0]}_summary.avi'
+        output_video_filename = '{}_summary.avi'.format(path.splitext(file_name)[0])
         output_video_path = path.join(current_test_folder_path, output_video_filename)
 
         bot.send_message(message.chat.id, 'Tracking objects...')
-        tracker.track_video(input_video_path, tracked_data_path, cropped_images_folder_path)
+        yolo_deepsort_detector.track_video(input_video_path, tracked_data_path, cropped_images_folder_path)
 
         bot.send_message(message.chat.id, 'Extracting the background...')
         background_extractor.extract(input_video_path, background_path, current_test_folder_path)
