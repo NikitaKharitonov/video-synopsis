@@ -5,7 +5,7 @@ import shutil
 import os
 from datetime import datetime
 import background_extractor
-
+import yolo_deepsort_detector
 
 # Initialize required paths
 INPUT_VIDEO = 'input.avi'
@@ -33,7 +33,8 @@ if not os.path.exists(CURRENT_TEST_FOLDER):
 OUTPUT_VIDEO = os.path.join(CURRENT_TEST_FOLDER, OUTPUT_VIDEO_FILENAME)
 
 print('Tracking objects...')
-tracker.track_video(INPUT_VIDEO, TRACKED_DATA, CROPPED_IMAGES_FOLDER)
+# tracker.track_video(INPUT_VIDEO, TRACKED_DATA, CROPPED_IMAGES_FOLDER)
+yolo_deepsort_detector.track_video(INPUT_VIDEO, TRACKED_DATA, CROPPED_IMAGES_FOLDER)
 
 print('Extracting the background...')
 background_extractor.extract(INPUT_VIDEO, BACKGROUND, CURRENT_TEST_FOLDER)
@@ -43,7 +44,7 @@ analyzer.analyze_json(TRACKED_DATA, ANALYZED_DATA)
 
 print('Making result video...')
 video_maker.make(CROPPED_IMAGES_FOLDER, ANALYZED_DATA, BACKGROUND, OUTPUT_VIDEO)
-print(f'Result video saved to {OUTPUT_VIDEO}')
+print('Result video saved to {}'.format(OUTPUT_VIDEO))
 
 # Copy the original video to the sample folder
 shutil.copy(INPUT_VIDEO, CURRENT_TEST_FOLDER)

@@ -60,6 +60,7 @@ def draw_box_label(id, img, bbox_cv2, box_color=(0, 255, 255), show_label=True):
 
     # Draw the bounding box
     # cv2.rectangle(img, (left, top), (right, bottom), box_color, 4)
+
     cv2.rectangle(img, (left, top), (right, bottom), box_color, 1)
 
     if show_label:
@@ -225,7 +226,7 @@ def assign_detections_to_trackers(trackers, detections, iou_thrd=0.01):
 def crop(frame, bbox):
     y0, x0, y1, x1 = bbox[0], bbox[1], bbox[2], bbox[3]
     if y0 < 0 or y1 < 0 or x1 < 0 or x0 < 0:
-        return []
+        return np.array([])
     return frame[y0:y1, x0:x1]
 
 
@@ -315,7 +316,7 @@ def pipeline(original_img, cropped_images_path, tracked_data):
                 frame_data.append(object_data)
                 # frame_data.append([trk.id, [x_cv2[0], x_cv2[1], x_cv2[2], x_cv2[3]]])
                 if cropped_img.shape[0] != 0 and cropped_img.shape[1] != 0:
-                    cv2.imwrite(os.path.join(cropped_images_path, f'{trk.frame}_{trk.id}.png'), cropped_img)
+                    cv2.imwrite(os.path.join(cropped_images_path, '{}_{}.png'.format(trk.frame, trk.id)), cropped_img)
                 trk.frame += 1
 
     tracked_data['frames'].append(frame_data)

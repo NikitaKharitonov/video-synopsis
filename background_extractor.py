@@ -19,7 +19,7 @@ def extract(video_filename, background_path, current_test_path):
         ret, frame = cap.read()
         if ret is False:
             break
-        cv.imwrite(os.path.join(FRAMES_FOLDER, f'{cnt}.png'), frame)
+        cv.imwrite(os.path.join(FRAMES_FOLDER, '{}.png'.format(cnt)), frame)
         if cv.waitKey(1) & 0xFF == ord('q'):
             break
         cnt += 1
@@ -32,7 +32,7 @@ def extract(video_filename, background_path, current_test_path):
     cnt = 1
     while True:
         try:
-            frame = cv.imread(os.path.join(FRAMES_FOLDER, f'{cnt}.png'))
+            frame = cv.imread(os.path.join(FRAMES_FOLDER, '{}.png'.format(cnt)))
             frame = frame / 255.0
             background = background + frame
             cnt += 1

@@ -21,7 +21,7 @@ def make(cropped_images_dir, data_filename, background_filename, output_video_pa
 
         for key, value in data.items():
             if i < len(value):
-                cropped_img = cv2.imread(os.path.join(cropped_images_dir, f'{i}_{key}.png'))
+                cropped_img = cv2.imread(os.path.join(cropped_images_dir, '{}_{}.png'.format(i, key)))
                 if cropped_img is not None:
                     bbox = value[i]
                     y0, x0, y1, x1, time = bbox['y_up'], bbox['x_left'], bbox['y_down'], bbox['x_right'], bbox['time']
@@ -30,7 +30,7 @@ def make(cropped_images_dir, data_filename, background_filename, output_video_pa
                     try:
                         added_image = cv2.addWeighted(place, alpha, cropped_img, 1 - alpha, 0)
                         img[y:y + h, x:x + w] = added_image
-                        img = cv2.putText(img, time, (x0, y1), cv2.FONT_HERSHEY_SIMPLEX, cropped_img.shape[1] / 180,
+                        img = cv2.putText(img, time, (x0, y1), cv2.FONT_HERSHEY_SIMPLEX, cropped_img.shape[1] / 140,
                                           (0, 255, 0), 1)
 
                     except Exception:

@@ -2,6 +2,10 @@
 __pycache__
 tests
 venv
+venv35
 input.avi
 dataset
 test.py
+models/yolo
+models/yolov4
+output_yolov4.avi
