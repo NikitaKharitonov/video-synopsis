@@ -1,0 +1,24 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, sans-serif;
+}
+
+form {
+    border: 1px solid black;
+    width: fit-content;
+    margin: auto;
+    padding: 1em;
+}
+
+form div {
+    margin-bottom: 1em;
+}
+
+form div:last-child {
+    margin-bottom: 0;
+}
