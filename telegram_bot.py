@@ -15,7 +15,7 @@ import tracker
 
 TOKEN = config.token
 bot = telebot.TeleBot(TOKEN)
-# server = Flask(__name__)
+server = Flask(__name__)
 
 
 @bot.message_handler(commands=['start', 'help'])
@@ -114,5 +114,5 @@ def get_video(message):
 if __name__ == "__main__":
     # server.debug = True
     bot.polling()
-    # server.run(host="0.0.0.0", port=int(os.environ.get('PORT', 5000)))
+    server.run(host="0.0.0.0", port=int(os.environ.get('PORT', 5000)))
     # server.run()
