@@ -3,7 +3,7 @@ import ntpath as path
 from datetime import datetime
 
 import telebot
-# from flask import Flask, request
+from flask import Flask, request
 
 import analyzer
 import background_extractor
