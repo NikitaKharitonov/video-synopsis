@@ -28,17 +28,17 @@ def start(message):
 #     bot.reply_to(message, message.text)
 
 
-# @server.route('/' + TOKEN, methods=['POST'])
-# def getMessage():
-#     bot.process_new_updates([telebot.types.Update.de_json(request.stream.read().decode("utf-8"))])
-#     return "!", 200
+@server.route('/' + TOKEN, methods=['POST'])
+def getMessage():
+    bot.process_new_updates([telebot.types.Update.de_json(request.stream.read().decode("utf-8"))])
+    return "!", 200
 
 
-# @server.route("/")
-# def webhook():
-#     bot.remove_webhook()
-#     bot.set_webhook(url='https://cryptic-inlet-53281.herokuapp.com/' + TOKEN)
-#     return "!", 200
+@server.route("/")
+def webhook():
+    bot.remove_webhook()
+    bot.set_webhook(url='https://cryptic-inlet-53281.herokuapp.com/' + TOKEN)
+    return "!", 200
 
 
 @bot.message_handler(content_types=['document'])
