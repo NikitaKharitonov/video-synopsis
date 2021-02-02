@@ -3,7 +3,7 @@ import ntpath as path
 from datetime import datetime
 
 import telebot
-from flask import Flask, request
+# from flask import Flask, request
 
 import analyzer
 import background_extractor
@@ -14,7 +14,7 @@ import yolo_deepsort_detector
 
 TOKEN = config.token
 bot = telebot.TeleBot(TOKEN)
-server = Flask(__name__)
+# server = Flask(__name__)
 
 
 @bot.message_handler(commands=['start', 'help'])
@@ -27,17 +27,17 @@ def start(message):
 #     bot.reply_to(message, message.text)
 
 
-@server.route('/' + TOKEN, methods=['POST'])
-def getMessage():
-    bot.process_new_updates([telebot.types.Update.de_json(request.stream.read().decode("utf-8"))])
-    return "!", 200
+# @server.route('/' + TOKEN, methods=['POST'])
+# def getMessage():
+#     bot.process_new_updates([telebot.types.Update.de_json(request.stream.read().decode("utf-8"))])
+#     return "!", 200
 
 
-@server.route("/")
-def webhook():
-    bot.remove_webhook()
-    bot.set_webhook(url='https://cryptic-inlet-53281.herokuapp.com/' + TOKEN)
-    return "!", 200
+# @server.route("/")
+# def webhook():
+#     bot.remove_webhook()
+#     bot.set_webhook(url='https://cryptic-inlet-53281.herokuapp.com/' + TOKEN)
+#     return "!", 200
 
 
 @bot.message_handler(content_types=['document'])
@@ -88,27 +88,30 @@ def get_video(message):
             bot.send_document(message.chat.id, output)
 
         # Move and delete redundant files and folders
-        for filename in os.listdir(cropped_images_folder_path):
-            filepath = path.join(cropped_images_folder_path, filename)
-            if path.exists(filepath):
-                os.remove(filepath)
-
-        if path.exists(cropped_images_folder_path):
-            os.rmdir(cropped_images_folder_path)
-        if path.exists(background_path):
-            os.remove(background_path)
-        if path.exists(tracked_data_path):
-            os.remove(tracked_data_path)
-        if path.exists(analyzed_data_path):
-            os.remove(analyzed_data_path)
-        if path.exists(input_video_path):
-            os.remove(input_video_path)
-        if path.exists(output_video_path):
-            os.remove(output_video_path)
+        # for filename in os.listdir(cropped_images_folder_path):
+        #     filepath = path.join(cropped_images_folder_path, filename)
+        #     if path.exists(filepath):
+        #         os.remove(filepath)
+        #
+        # if path.exists(cropped_images_folder_path):
+        #     os.rmdir(cropped_images_folder_path)
+        # if path.exists(background_path):
+        #     os.remove(background_path)
+        # if path.exists(tracked_data_path):
+        #     os.remove(tracked_data_path)
+        # if path.exists(analyzed_data_path):
+        #     os.remove(analyzed_data_path)
+        # if path.exists(input_video_path):
+        #     os.remove(input_video_path)
+        # if path.exists(output_video_path):
+        #     os.remove(output_video_path)
 
     except Exception as ex:
         bot.send_message(message.chat.id, "[!] error - {}".format(str(ex)))
 
 
 if __name__ == "__main__":
-    server.run(host="0.0.0.0", port=int(os.environ.get('PORT', 5000)))
+    # server.debug = True
+    bot.polling()
+    # server.run(host="0.0.0.0", port=int(os.environ.get('PORT', 5000)))
+    # server.run()
