@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+
+{% block head %}
+<title>History</title>
+{% endblock %}
+
+{% block body %}
+<table id="videos">
+    {% if videos != [] %}
+        <tr>
+            <th>Name</th>
+            <th>Time</th>
+            <th></th>
+        </tr>
+        {% for video in videos %}
+            <tr>
+                <td>{{ video['name'] }}</td>
+                <td>{{ video['datetime'].strftime("%d.%m.%Y %H:%M:%S") }}</td>
+                <td>
+                    <form action="/getvideo{{index}}" method="GET">
+                        <input type="hidden" id="index" name='index' value="{{ loop.index }}">
+                        <input type="submit" value="Download">
+                    </form>
+                </td>
+            </tr>
+        {% endfor %}
+    {% endif %}
+</table>
+{% endblock %}

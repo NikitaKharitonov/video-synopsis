@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+
+{% block head %}
+<title>Download</title>
+{% endblock %}
+
+{% block body %}
+<form action="/getvideo" method="GET">
+    <div>Result video is ready</div>
+    <div>
+        <input type="submit" value="Download">
+    </div>
+    <div>
+        <a href="/">Back</a>
+    </div>
+</form>
+{% endblock %}
