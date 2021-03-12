@@ -1,0 +1,14 @@
+.idea
+__pycache__
+tests
+venv
+venv35
+venv37
+input.avi
+dataset
+test.py
+models/yolo
+
+output_yolov4.avi
+output_yolov4.mp4
+.git

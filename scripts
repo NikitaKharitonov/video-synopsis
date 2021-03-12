@@ -1,0 +1,6 @@
+docker build -t video-synopsis .
+docker run --rm -p 5000:5000 video-synopsis
+
+heroku container:login
+heroku container:push web -a nvkh-video-synopsis
+heroku container:release web -a nvkh-video-synopsis

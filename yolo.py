@@ -21,12 +21,13 @@ class YOLO(object):
         self.model_path = 'models/yolov4/yolo4.h5'
         self.anchors_path = 'models/yolov4/yolo_anchors.txt'
         self.classes_path = 'models/yolov4/coco_classes.txt'
-        self.gpu_num = 1
+        # self.gpu_num = 1
         self.score = 0.5
         self.iou = 0.5
         self.class_names = self._get_class()
         self.anchors = self._get_anchors()
         self.sess = tf.compat.v1.keras.backend.get_session()
+        # self.sess = keras.backend.tensorflow_backend.get_session()
         self.model_image_size = (416, 416)  # fixed size or (None, None)
         self.is_fixed_size = self.model_image_size != (None, None)
         self.boxes, self.scores, self.classes = self.generate()
