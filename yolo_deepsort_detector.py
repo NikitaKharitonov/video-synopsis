@@ -1,9 +1,5 @@
-#! /usr/bin/env python
-# -*- coding: utf-8 -*-
-
 from __future__ import division, print_function, absolute_import
 
-# from timeit import time
 import warnings
 import cv2
 import os
@@ -21,7 +17,6 @@ from deep_sort.tracker import Tracker
 from tools import generate_detections as gdet
 from tracker import draw_box_label, crop
 
-# import imutils.video
 
 warnings.filterwarnings('ignore')
 
@@ -49,31 +44,21 @@ def track_video(file_path, tracked_data_output_file, cropped_images_folder):
 
     video_capture = cv2.VideoCapture(file_path)
 
-    tracked_data = {'frames': []}
-
-    # if writeVideo_flag:
-    #     w = int(video_capture.get(3))
-    #     h = int(video_capture.get(4))
-    #     fourcc = cv2.VideoWriter_fourcc(*'XVID')
-    #     out = cv2.VideoWriter('output_yolov4.avi', fourcc, 30, (w, h))
-    #     frame_index = -1
+    tracked_data = {'activities': {}}
 
     fps = 0.0
-    # fps_imutils = imutils.video.FPS().start()
 
     # The list of frames counts for each tracked object
-    frame_counts = {}
     frame_count = 0
+    frame_counts = {}
 
     while True:
 
         fps = video_capture.get(cv2.CAP_PROP_FPS)
 
-        ret, frame = video_capture.read()  # frame shape 640*480*3
+        ret, frame = video_capture.read()  
         if ret != True:
             break
-
-        # t1 = time.time()
 
         image = Image.fromarray(frame[..., ::-1])  # bgr to rgb
         boxes, confidence, classes = yolo.detect_image(image)
@@ -98,15 +83,10 @@ def track_video(file_path, tracked_data_output_file, cropped_images_folder):
             tracker.predict()
             tracker.update(detections)
 
-            # if len(tracker.tracks) > 0:
-            #     max_trk_id = np.max([track.track_id for track in tracker.tracks])
-            #     if len(frame_counts) - 1 < max_trk_id:
-            #         np.concatenate((frame_counts, np.zeros(max_trk_id - len(frame_counts) + 1)))
-
             time = str(datetime.timedelta(seconds=frame_count / fps)).split('.')[0]
 
             # The list of tracks to be annotated
-            frame_data = []
+            activities = []
             for track in tracker.tracks:
                 if track.track_id not in frame_counts.keys():
                     frame_counts[track.track_id] = 0
@@ -115,63 +95,31 @@ def track_video(file_path, tracked_data_output_file, cropped_images_folder):
                 bbox = track.to_tlbr()
                 bbox = bbox.astype("int")
 
-                # original_img = np.copy(frame)
-                # print(bbox)
-                # frame = draw_box_label(track.track_id, frame, [bbox[1], bbox[0], bbox[3], bbox[2]], (255, 255, 255))  # Draw the bounding boxes on the images
                 cropped_img = crop(frame, [bbox[1], bbox[0], bbox[3], bbox[2]])
 
-                object_data = {'id': int(track.track_id), 'y_up': int(bbox[1]), 'x_left': int(bbox[0]), 'y_down': int(bbox[3]),
-                               'x_right': int(bbox[2]), 'time': time}
-                frame_data.append(object_data)
+                activity_id = str(track.track_id)
+                if activity_id not in tracked_data['activities'].keys():
+                    tracked_data['activities'][activity_id] = {'start_frame': frame_count, 'frame_count': 0, 'bounding_boxes': []}
+                tracked_data['activities'][activity_id]['bounding_boxes'].append({'y_up': int(bbox[1]), 'x_left': int(bbox[0]), 'y_down': int(bbox[3]), 'x_right': int(bbox[2]), 'time': time})
+                tracked_data['activities'][activity_id]['frame_count'] += 1
 
                 if cropped_img.shape[0] != 0 and cropped_img.shape[1] != 0:
+                    activity_dir_path = os.path.join(cropped_images_folder, activity_id)
+                    if not os.path.exists(activity_dir_path):
+                        os.mkdir(activity_dir_path) 
                     cv2.imwrite(
-                        os.path.join(cropped_images_folder, '{}_{}.png'.format(frame_counts[track.track_id], track.track_id)),
+                        os.path.join(activity_dir_path, '{}.png'.format(frame_counts[track.track_id])),
                         cropped_img)
                 frame_counts[track.track_id] += 1
 
-                # frame_counts[track.track_id] += 1
-            tracked_data['frames'].append(frame_data)
-
-
-        # for det in detections:
-        #     bbox = det.to_tlbr()
-        # score = "%.2f" % round(det.confidence * 100, 2) + "%"
-        # cv2.rectangle(frame, (int(bbox[0]), int(bbox[1])), (int(bbox[2]), int(bbox[3])), (255, 0, 0), 2)
-        # if len(classes) > 0:
-        #     cls = det.cls
-        # cv2.putText(frame, str(cls) + " " + score, (int(bbox[0]), int(bbox[3])), 0,
-        #             1.5e-3 * frame.shape[0], (0, 255, 0), 1)
-
-        # cv2.imshow('', frame)
-
-        # if writeVideo_flag:  # and not asyncVideo_flag:
-        #     # save a frame
-        #     out.write(frame)
-        #     frame_index = frame_index + 1
-
-        # fps_imutils.update()
-
-        # fps = (fps + (1./(time.time()-t1))) / 2
-        # print("FPS = %f"%(fps))
-
-        # Press Q to stop!
         if cv2.waitKey(1) & 0xFF == ord('q'):
             break
 
         frame_count += 1
 
-    # fps_imutils.stop()
-    # print('imutils FPS: {}'.format(fps_imutils.fps()))
-    # print(tracked_data)
     with open(tracked_data_output_file, "w") as file:
         json.dump(tracked_data, file, indent=4)
 
     video_capture.release()
 
-    # if writeVideo_flag:
-    #     out.release()
-
     cv2.destroyAllWindows()
-
-

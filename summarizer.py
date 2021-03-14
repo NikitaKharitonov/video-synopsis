@@ -32,10 +32,10 @@ def summarize(input_video_file_path):
     new_input_video_file_path = os.path.join(test_dir_name, input_video_file_name)
     tracked_data_file_path = os.path.join(test_dir_name, TRACKED_DATA_FILE_NAME)
     analyzed_data_file_path = os.path.join(test_dir_name, ANALYZED_DATA_FILE_NAME)
-    cropped_images_dir_name = os.path.join(test_dir_name, CROPPED_IMAGES_FOLDER_NAME)
+    cropped_images_dir_path = os.path.join(test_dir_name, CROPPED_IMAGES_FOLDER_NAME)
 
-    if not os.path.exists(cropped_images_dir_name):
-        os.mkdir(cropped_images_dir_name)
+    if not os.path.exists(cropped_images_dir_path):
+        os.mkdir(cropped_images_dir_path)
 
     background_file_path = os.path.join(test_dir_name, BACKGROUND_FILE_NAME)
     output_video_file_name = input_video_file_name[:input_video_file_name.rfind('.')] + "_Synopsis.avi"
@@ -44,7 +44,7 @@ def summarize(input_video_file_path):
     shutil.copy(input_video_file_path, new_input_video_file_path)
 
     print('Tracking objects...')
-    yolo_deepsort_detector.track_video(new_input_video_file_path, tracked_data_file_path, cropped_images_dir_name)
+    yolo_deepsort_detector.track_video(new_input_video_file_path, tracked_data_file_path, cropped_images_dir_path)
 
     print('Extracting the background...')
     background_extractor.extract(new_input_video_file_path, background_file_path, test_dir_name)
@@ -53,15 +53,22 @@ def summarize(input_video_file_path):
     analyzer.analyze_json(tracked_data_file_path, analyzed_data_file_path)
 
     print('Making result video...')
-    video_maker.make(cropped_images_dir_name, analyzed_data_file_path, background_file_path, output_video_file_path)
+    video_maker.make(cropped_images_dir_path, analyzed_data_file_path, background_file_path, output_video_file_path)
     # video.save(output_video_file_path)
     print('Output video saved to {}'.format(output_video_file_path))
 
-    for file in os.listdir(cropped_images_dir_name):
-        os.remove(os.path.join(cropped_images_dir_name, file))
+    for filename in os.listdir(cropped_images_dir_path):
+        file_path = os.path.join(cropped_images_dir_path, filename)
+        try:
+            if os.path.isfile(file_path) or os.path.islink(file_path):
+                os.unlink(file_path)
+            elif os.path.isdir(file_path):
+                shutil.rmtree(file_path)
+        except Exception as e:
+            print('Failed to delete %s. Reason: %s' % (file_path, e))
 
-    if os.path.exists(cropped_images_dir_name):
-        os.rmdir(cropped_images_dir_name)
+    if os.path.exists(cropped_images_dir_path):
+        os.rmdir(cropped_images_dir_path)
     if os.path.exists(background_file_path):
         os.remove(background_file_path)
     if os.path.exists(tracked_data_file_path):
