@@ -5,3 +5,5 @@ venv
 videos
 models/yolo
 models/yolov4
+images
+tests2
