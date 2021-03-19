@@ -22,7 +22,7 @@ def make(cropped_images_dir, data_filename, background_filename, output_video_pa
                 if activity['start_frame'] <= frame_idx < activity['start_frame'] + activity['frame_count']:
                     cropped_img = cv2.imread(os.path.join(cropped_images_dir, id, '{}.png'.format(frame_idx - activity['start_frame'])))
                     if cropped_img is not None:
-                        bbox = activity['bounding_boxes'][frame_idx]
+                        bbox = activity['bounding_boxes'][frame_idx - activity['start_frame']]
                         y0, x0, y1, x1 = bbox['y_up'], bbox['x_left'], bbox['y_down'], bbox['x_right']
                         x, y, w, h = x0, y0, x1 - x0, y1 - y0
                         place = img[y:y + h, x:x + w]
@@ -40,10 +40,3 @@ def make(cropped_images_dir, data_filename, background_filename, output_video_pa
             out.write(img)
 
         out.release()
-
-def make3(cropped_images_dir, data_filename, background_filename, output_video_path):
-    background = cv2.imread(background_filename)
-
-    with open(data_filename, 'r') as file:
-        data = json.load(file)
-        activities = data['activities']

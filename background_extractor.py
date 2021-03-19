@@ -4,6 +4,9 @@ import os
 
 
 def extract(video_filename, background_path, current_test_path):
+    if not os.path.exists(current_test_path):
+        os.mkdir(current_test_path)
+        
     FRAMES_FOLDER = os.path.join(current_test_path, 'frames')
 
     if os.path.exists(FRAMES_FOLDER):
