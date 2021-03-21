@@ -5,23 +5,64 @@
 {% endblock %}
 
 {% block body %}
-<form action="/submit" method="POST" enctype="multipart/form-data" id="form">
-    <div>
-        <label for="video">Video</label>
-        <input type="file" name="video"/>
-    </div>
-    <!-- <div>
-        <label for="model">Model</label>        
-        <select name="model"> 
-            <option value="SSD">SSD</option>
-            <option value="YOLO">YOLO</option>
-        </select>
-    </div> -->
-    <div>
-        <input type="submit" id="submit" value="Submit"/>
-    </div>
-</form>    
+<div class="testbox">
+    <form action="/submit" method="POST" enctype="multipart/form-data" id="form">
+        <div class="banner">
+            <h1>Open Video Synopsis</h1>
+        </div>
+        <div class="item">
+            <p>Video file</p>
+            <input type="file" name="video"/>
+        </div>
+        <h5>Parameters</h5>
+        <div class="question">
+            <p>Activity density:</p>
+            <div class="question-answer">
+                <input type="radio" value="0.05" id="radio_1" name="activity_density"/>
+                <label for="radio_1" class="radio"><span>0.05</span></label>
+                <input type="radio" value="0.10" id="radio_2" name="activity_density" checked/>
+                <label for="radio_2" class="radio"><span>0.10</span></label>
+                <input type="radio" value="0.15" id="radio_3" name="activity_density"/>
+                <label for="radio_3" class="radio"><span>0.15</span></label>
+            </div>
+        </div>
+        <div class="question">
+            <p>Cluster density:</p>
+            <div class="question-answer">
+                <input type="radio" value="0.4" id="radio_4" name="cluster_density"/>
+                <label for="radio_4" class="radio"><span>0.4</span></label>
+                <input type="radio" value="0.5" id="radio_5" name="cluster_density" checked/>
+                <label for="radio_5" class="radio"><span>0.5</span></label>
+                <input type="radio" value="0.6" id="radio_6" name="cluster_density"/>
+                <label for="radio_6" class="radio"><span>0.6</span></label>
+            </div>
+        </div>
+        <div class="question">
+            <p>Classes:</p>
+            <small>Choose at least one</small>
+            <div class="question-answer checkbox-item">
+                <div>
+                    <input type="checkbox" value="person" id="check_1" name="class"/>
+                    <label for="check_1" class="check"><span>person</span></label>
+                </div>
+                <div>
+                    <input type="checkbox" value="car" id="check_2" name="class"/>
+                    <label for="check_2" class="check"><span>car</span></label>
+                </div>
+                <div>
+                    <input type="checkbox" value="bike" id="check_3" name="class"/>
+                    <label for="check_3" class="check"><span>bike</span></label>
+                </div>
+            </div
+        </div>
+        <br />
+        <div class="btn-block">
+            <input type="submit"></button>
+        </div>
+    </form>
+</div>
 {% endblock %}
 
 
-      
+       
+       

@@ -61,6 +61,11 @@ TIMESTAMP_FORMAT = "%Y_%m_%d_%H_%M_%S"
 @app.route('/submit', methods=['POST'])
 def submit():
     video = request.files.get('video', '')
+    class_list = request.form.getlist('class')
+    if len(class_list) == 0:
+        class_list = ['person', 'car', 'bike']
+    activity_density = float(request.form['activity_density'])
+    cluster_density = float(request.form['cluster_density'])
     input_video_file_name = str(video.filename)
     videos_dirname = 'videos'
     current_video_dirname = str(datetime.now().time()).replace(':', '.')
@@ -71,10 +76,9 @@ def submit():
     input_video_file_path = os.path.join(input_video_dir_path, input_video_file_name)
     video.save(input_video_file_path)
 
-    output_video_file_path = summarizer.summarize(input_video_file_path)
+    output_video_file_path = summarizer.summarize(input_video_file_path, class_list, activity_density, cluster_density)
 
     return send_from_directory(ntpath.dirname(output_video_file_path), filename=ntpath.basename(output_video_file_path), as_attachment=True)
-
 
 @app.route('/download')
 def download():

@@ -14,9 +14,9 @@ BACKGROUND_FILE_NAME = 'background.png'
 TESTS_DIR_NAME = 'tests'
 TIMESTAMP_FORMAT = "%Y_%m_%d_%H_%M_%S"
 
-classes_list = ['person', 'car']
+classes_list = ['person', 'car', 'bike']
 
-def summarize(input_video_file_path):
+def summarize(input_video_file_path, class_list_to_display, activity_density, cluster_density):
 
     if not os.path.exists(TESTS_DIR_NAME):
         os.mkdir(TESTS_DIR_NAME)
@@ -52,7 +52,7 @@ def summarize(input_video_file_path):
     background_extractor.extract(new_input_video_file_path, background_file_path, test_dir_name)
 
     print('Analyzing tracked data...')
-    analyzer.analyze_json(tracked_data_file_path, analyzed_data_file_path)
+    analyzer.analyze_json(tracked_data_file_path, analyzed_data_file_path, class_list_to_display, activity_density, cluster_density)
 
     print('Making result video...')
     video_maker.make(cropped_images_dir_path, analyzed_data_file_path, background_file_path, output_video_file_path)
