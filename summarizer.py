@@ -14,6 +14,8 @@ BACKGROUND_FILE_NAME = 'background.png'
 TESTS_DIR_NAME = 'tests'
 TIMESTAMP_FORMAT = "%Y_%m_%d_%H_%M_%S"
 
+classes_list = ['person', 'car']
+
 def summarize(input_video_file_path):
 
     if not os.path.exists(TESTS_DIR_NAME):
@@ -44,7 +46,7 @@ def summarize(input_video_file_path):
     shutil.copy(input_video_file_path, new_input_video_file_path)
 
     print('Tracking objects...')
-    yolo_deepsort_detector.track_video(new_input_video_file_path, tracked_data_file_path, cropped_images_dir_path)
+    yolo_deepsort_detector.track_video(new_input_video_file_path, tracked_data_file_path, cropped_images_dir_path, classes_list)
 
     print('Extracting the background...')
     background_extractor.extract(new_input_video_file_path, background_file_path, test_dir_name)

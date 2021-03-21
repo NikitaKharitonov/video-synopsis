@@ -21,7 +21,7 @@ from tracker import draw_box_label, crop
 warnings.filterwarnings('ignore')
 
 
-def track_video(file_path, tracked_data_output_file, cropped_images_folder):
+def track_video(file_path, tracked_data_output_file, cropped_images_folder, classes_list):
     yolo = YOLO()
     fps = 0
     if not os.path.exists(cropped_images_folder):
@@ -61,7 +61,7 @@ def track_video(file_path, tracked_data_output_file, cropped_images_folder):
             break
 
         image = Image.fromarray(frame[..., ::-1])  # bgr to rgb
-        boxes, confidence, classes = yolo.detect_image(image)
+        boxes, confidence, classes = yolo.detect_image(image, classes_list)
 
         if tracking:
             features = encoder(frame, boxes)
@@ -87,19 +87,20 @@ def track_video(file_path, tracked_data_output_file, cropped_images_folder):
 
             # The list of tracks to be annotated
             activities = []
-            for track in tracker.tracks:
+            for idx, track in enumerate(tracker.tracks):
                 if track.track_id not in frame_counts.keys():
                     frame_counts[track.track_id] = 0
                 if not track.is_confirmed() or track.time_since_update > 1:
                     continue
                 bbox = track.to_tlbr()
                 bbox = bbox.astype("int")
+                class_name = track.class_name
 
                 cropped_img = crop(frame, [bbox[1], bbox[0], bbox[3], bbox[2]])
 
                 activity_id = str(track.track_id)
                 if activity_id not in tracked_data['activities'].keys():
-                    tracked_data['activities'][activity_id] = {'start_frame': frame_count, 'frame_count': 0, 'bounding_boxes': []}
+                    tracked_data['activities'][activity_id] = {'class': class_name, 'start_frame': frame_count, 'frame_count': 0, 'bounding_boxes': []}
                 tracked_data['activities'][activity_id]['bounding_boxes'].append({'y_up': int(bbox[1]), 'x_left': int(bbox[0]), 'y_down': int(bbox[3]), 'x_right': int(bbox[2]), 'time': time})
                 tracked_data['activities'][activity_id]['frame_count'] += 1
 

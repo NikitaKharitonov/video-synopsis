@@ -44,12 +44,13 @@ def get_similarity(a1, a2):
 #         tubes.append(tube) 
 #     return tubes
 
-def analyze_json(input_file_path, output_file_path):
+def analyze_json(input_file_path, output_file_path, classes_list):
     analyzed_data = {}
     start_frame = 0
     with open(input_file_path, 'r') as input_file:
         tracked_data = json.load(input_file)
         activities = tracked_data['activities']
+        activities = {key: a for key, a in activities.items() if a['class'] in classes_list}
         for activity in activities.values():
             activity['start_frame'] = 0
         clusters = get_clusters(activities)
@@ -91,7 +92,7 @@ def get_clusters(activities):
             for idx2, val2 in enumerate(activities):
                 if val2 is not None:
                     k2, a2 = val2
-                    if get_overlap_area(a1, a2) > 0.1:
+                    if get_similarity(a1, a2) > 0.1:
                         cluster.update({k2: a2})
                         activities[idx2] = None
             clusters.append(cluster)
