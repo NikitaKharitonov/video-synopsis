@@ -4,6 +4,7 @@ import video_maker
 import shutil
 import os
 from datetime import datetime
+import time
 import background_extractor
 import yolo_deepsort_detector
 
@@ -35,6 +36,7 @@ def summarize(input_video_file_path, class_list_to_display, activity_collision_c
     tracked_data_file_path = os.path.join(test_dir_name, TRACKED_DATA_FILE_NAME)
     analyzed_data_file_path = os.path.join(test_dir_name, ANALYZED_DATA_FILE_NAME)
     cropped_images_dir_path = os.path.join(test_dir_name, CROPPED_IMAGES_FOLDER_NAME)
+    performance_file_path = os.path.join(test_dir_name, 'performance.txt')
 
     if not os.path.exists(cropped_images_dir_path):
         os.mkdir(cropped_images_dir_path)
@@ -45,19 +47,36 @@ def summarize(input_video_file_path, class_list_to_display, activity_collision_c
 
     shutil.copy(input_video_file_path, new_input_video_file_path)
 
-    print('Tracking objects...')
+    print('Tracking activities...')
+    start = time.time()
     yolo_deepsort_detector.track_video(new_input_video_file_path, tracked_data_file_path, cropped_images_dir_path, classes_list)
+    end = time.time()
+    tracking_time = end - start
 
     print('Extracting the background...')
+    start = time.time()
     background_extractor.extract(new_input_video_file_path, background_file_path, test_dir_name)
+    end = time.time()
+    background_extraction_time = end - start
 
-    print('Analyzing tracked data...')
-    analyzer.analyze_json(tracked_data_file_path, analyzed_data_file_path, class_list_to_display, activity_collision_cost, cluster_collision_costy)
+    print('Processing tracked data...')
+    start = time.time()
+    analyzer.analyze_json(tracked_data_file_path, analyzed_data_file_path, class_list_to_display, activity_collision_cost, cluster_collision_cost)
+    end = time.time()
+    processing_time = end - start
 
     print('Making result video...')
+    start = time.time()
     video_maker.make(cropped_images_dir_path, analyzed_data_file_path, background_file_path, output_video_file_path)
-    # video.save(output_video_file_path)
+    end = time.time()
+    creating_video_time = end - start
     print('Output video saved to {}'.format(output_video_file_path))
+
+    with open(performance_file_path, 'w') as performance_file:
+        performance_file.write('Tracking: {:.6f}s\n'.format(tracking_time))
+        performance_file.write('Background extraction: {:.6f}s\n'.format(background_extraction_time))
+        performance_file.write('Processing: {:.6f}s\n'.format(processing_time))
+        performance_file.write('Creating video: {:.6f}s\n'.format(creating_video_time))
 
     for filename in os.listdir(cropped_images_dir_path):
         file_path = os.path.join(cropped_images_dir_path, filename)

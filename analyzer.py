@@ -1,15 +1,5 @@
 import json
 
-# def analyze_json(input_file_path, output_file_path):
-#     analyzed_data = {}
-#     with open(input_file_path, 'r') as input_file:
-#         tracked_data = json.load(input_file)
-#         activities = tracked_data['activities']
-#         for activity in activities.values():
-#             activity['start_frame'] = 0
-#         with open(output_file_path, 'w') as output_file:
-#             json.dump(tracked_data, output_file, indent=4)
-
 def get_similarity(a1, a2):
     start_frame_idx = max(a1['start_frame'], a2['start_frame'])
     end_frame_idx = min(a1['start_frame'] + a1['frame_count'] - 1, a2['start_frame'] + a2['frame_count'] - 1)
@@ -46,7 +36,6 @@ def get_similarity(a1, a2):
 
 def analyze_json(input_file_path, output_file_path, classes_list, activity_collision_cost, cluster_collision_cost):
     print(classes_list, activity_collision_cost, cluster_collision_cost)
-    analyzed_data = {}
     start_frame = 0
     with open(input_file_path, 'r') as input_file:
         tracked_data = json.load(input_file)
