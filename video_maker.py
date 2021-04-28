@@ -31,7 +31,7 @@ def make(cropped_images_dir, data_filename, background_filename, output_video_pa
                         img[y:y + h, x:x + w] = added_image
                         # img = cv2.rectangle(img, (x0, y1), (x0 + 40, y1 - 8), (255, 255, 255), thickness=-1)
                         # img = cv2.putText(img, '{} - {}'.format(id, time), (x0, y1), cv2.FONT_HERSHEY_SIMPLEX, cropped_img.shape[1] / 140, (0, 0, 0), 1)
-                        img = cv2.putText(img, '{} - {}'.format(id, time), (x0, y0), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 1)
+                        img = cv2.putText(img, '{} - {}'.format(id, time), (x0, y0), cv2.FONT_HERSHEY_SIMPLEX, 0.3, (255, 255, 255), 1)
 
             out.write(img)
 
