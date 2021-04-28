@@ -44,8 +44,8 @@ def get_similarity(a1, a2):
 #         tubes.append(tube) 
 #     return tubes
 
-def analyze_json(input_file_path, output_file_path, classes_list, activity_density, cluster_density):
-    print(classes_list, activity_density, cluster_density)
+def analyze_json(input_file_path, output_file_path, classes_list, activity_collision_cost, cluster_collision_cost):
+    print(classes_list, activity_collision_cost, cluster_collision_cost)
     analyzed_data = {}
     start_frame = 0
     with open(input_file_path, 'r') as input_file:
@@ -54,13 +54,13 @@ def analyze_json(input_file_path, output_file_path, classes_list, activity_densi
         activities = {key: a for key, a in activities.items() if a['class'] in classes_list}
         for activity in activities.values():
             activity['start_frame'] = 0
-        clusters = get_clusters(activities, activity_density)
+        clusters = get_clusters(activities, activity_collision_cost)
         print(len(clusters))
         for cluster in clusters:
             print(len(cluster))
             for i1, (k1, a1) in enumerate(list(cluster.items())[:-1]):
                 for i2, (k2, a2) in enumerate(list(cluster.items())[i1+1:]):
-                    while get_similarity(a1, a2) > activity_density:
+                    while get_similarity(a1, a2) > activity_collision_cost:
                         a2['start_frame'] += 1
         for idx1, cluster1 in enumerate(clusters[:-1]):
             for idx2, cluster2 in enumerate(clusters[idx1 + 1:]):
@@ -69,7 +69,7 @@ def analyze_json(input_file_path, output_file_path, classes_list, activity_densi
                     for k2, a2 in cluster2.items():
                         overlap += get_similarity(a1, a2)
                 print(idx1, idx2, 'overlap', overlap)
-                while overlap > cluster_density:
+                while overlap > cluster_collision_cost:
                     for k2, a2 in cluster2.items():
                         a2['start_frame'] += 1
                     overlap = 0
@@ -82,7 +82,7 @@ def analyze_json(input_file_path, output_file_path, classes_list, activity_densi
         with open(output_file_path, 'w') as out:
             json.dump(tracked_data, out, indent=4)
 
-def get_clusters(activities, activity_density):
+def get_clusters(activities, activity_collision_cost):
     clusters = []
     activities = list(activities.items())
     for idx1, val1 in enumerate(activities):
@@ -93,7 +93,7 @@ def get_clusters(activities, activity_density):
             for idx2, val2 in enumerate(activities):
                 if val2 is not None:
                     k2, a2 = val2
-                    if get_similarity(a1, a2) > activity_density:
+                    if get_similarity(a1, a2) > activity_collision_cost:
                         cluster.update({k2: a2})
                         activities[idx2] = None
             clusters.append(cluster)

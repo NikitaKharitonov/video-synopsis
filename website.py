@@ -64,8 +64,8 @@ def submit():
     class_list = request.form.getlist('class')
     if len(class_list) == 0:
         class_list = ['person', 'car', 'bike']
-    activity_density = float(request.form['activity_density'])
-    cluster_density = float(request.form['cluster_density'])
+    activity_collision_cost = float(request.form['activity_collision_cost'])
+    cluster_collision_cost = float(request.form['cluster_collision_cost'])
     input_video_file_name = str(video.filename)
     videos_dirname = 'videos'
     current_video_dirname = str(datetime.now().time()).replace(':', '.')
@@ -76,7 +76,7 @@ def submit():
     input_video_file_path = os.path.join(input_video_dir_path, input_video_file_name)
     video.save(input_video_file_path)
 
-    output_video_file_path = summarizer.summarize(input_video_file_path, class_list, activity_density, cluster_density)
+    output_video_file_path = summarizer.summarize(input_video_file_path, class_list, activity_collision_cost, cluster_collision_cost)
 
     return send_from_directory(ntpath.dirname(output_video_file_path), filename=ntpath.basename(output_video_file_path), as_attachment=True)
 
