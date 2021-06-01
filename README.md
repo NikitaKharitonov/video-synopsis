@@ -4,4 +4,5 @@
 
 ## Как запускать 
 pip install -r requirements.txt
+
 python website.py
