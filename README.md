@@ -1,4 +1,7 @@
 # video-synopsis 
 ## About
-This is a simple implementation of the Video Synopsis technology
-https://en.wikipedia.org/wiki/Video_synopsis
+Программа для ВКР
+
+## Как запускать 
+pip install -r requirements.txt
+python website.py
