@@ -15,28 +15,12 @@ def get_similarity(a1, a2):
             area = dx*dy
             a1_area = (a1_bbox['y_down'] - a1_bbox['y_up']) * (a1_bbox['x_right'] - a1_bbox['x_left'])
             a2_area = (a2_bbox['y_down'] - a2_bbox['y_up']) * (a2_bbox['x_right'] - a2_bbox['x_left'])
-            # union_area = a1_area + a2_area - area
             similarity += area / min(a1_area, a2_area)
     if end_frame_idx - start_frame_idx + 1 == 0:
         return 0
     return similarity / (end_frame_idx - start_frame_idx + 1)
 
-# def get_tubes_from_activities(activities):
-#     tubes = []
-#     for a in activities.values():
-#         tube = []
-#         start_frame = a['start_frame']
-#         for idx, bbox in enumerate(a['bounding_boxes']):
-#             x = bbox['x_right'] - bbox['x_left']
-#             y = bbox['y_down'] - bbox['y_up']
-#             t = start_frame + idx
-#             tube.append((x, y, t))
-#         tubes.append(tube) 
-#     return tubes
-
 def analyze_json(input_file_path, output_file_path, classes_list, activity_collision_cost, cluster_collision_cost):
-    print(classes_list, activity_collision_cost, cluster_collision_cost)
-    start_frame = 0
     with open(input_file_path, 'r') as input_file:
         tracked_data = json.load(input_file)
         activities = tracked_data['activities']
