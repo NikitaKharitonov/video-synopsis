@@ -52,6 +52,9 @@ def track_video(file_path, tracked_data_output_file, cropped_images_folder, clas
     frame_count = 0
     frame_counts = {}
 
+    if writeVideo_flag:
+        out = cv2.VideoWriter('outpy.avi',cv2.VideoWriter_fourcc('M','J','P','G'), 10, (640,360))
+
     while True:
 
         fps = video_capture.get(cv2.CAP_PROP_FPS)
@@ -99,6 +102,12 @@ def track_video(file_path, tracked_data_output_file, cropped_images_folder, clas
                 cropped_img = crop(frame, [bbox[1], bbox[0], bbox[3], bbox[2]])
 
                 activity_id = str(track.track_id)
+
+                if writeVideo_flag:
+                    # draw
+                    cv2.rectangle(frame, (int(bbox[0]), int(bbox[1])), (int(bbox[2]), int(bbox[3])), (255, 0, 0), 6)
+                    cv2.putText(frame, activity_id, (int(bbox[0]), int(bbox[1]) - 6), cv2.FONT_HERSHEY_PLAIN, 2, (0,0,0), 2)
+
                 if activity_id not in tracked_data['activities'].keys():
                     tracked_data['activities'][activity_id] = {'class': class_name, 'start_frame': frame_count, 'frame_count': 0, 'bounding_boxes': []}
                 tracked_data['activities'][activity_id]['bounding_boxes'].append({'y_up': int(bbox[1]), 'x_left': int(bbox[0]), 'y_down': int(bbox[3]), 'x_right': int(bbox[2]), 'time': time})
@@ -113,6 +122,10 @@ def track_video(file_path, tracked_data_output_file, cropped_images_folder, clas
                         cropped_img)
                 frame_counts[track.track_id] += 1
 
+        if writeVideo_flag:
+            # write
+            out.write(frame)
+
         if cv2.waitKey(1) & 0xFF == ord('q'):
             break
 
@@ -121,6 +134,7 @@ def track_video(file_path, tracked_data_output_file, cropped_images_folder, clas
     with open(tracked_data_output_file, "w") as file:
         json.dump(tracked_data, file, indent=4)
 
+    out.release()
     video_capture.release()
 
     cv2.destroyAllWindows()

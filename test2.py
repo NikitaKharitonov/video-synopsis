@@ -9,7 +9,8 @@ import summarizer
 classes_list = ['person', 'car']
 
 if __name__ == '__main__':
-    summarizer.summarize('videos/pedestrian.avi', ['person', 'car'], 0.1, 0.5)
+    # summarizer.summarize('videos/pedestrian.avi', ['person', 'car'], 0.1, 0.5)
+    yolo_deepsort_detector.track_video('videos/pedestrian.avi', 'tracked_data.json', 'crppd_imgs_fldr', ['person', 'car'])
     # test_dir_path = 'output2'
 
     # for case_dir_name in os.listdir(test_dir_path)[9:10]:
